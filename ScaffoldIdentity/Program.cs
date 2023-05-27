@@ -1,4 +1,14 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using ScaffoldIdentity.Data;
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("ScaffoldIdentityContextConnection") ?? throw new InvalidOperationException("Connection string 'ScaffoldIdentityContextConnection' not found.");
+
+builder.Services.AddDbContext<ScaffoldIdentityContext>(options =>
+    options.UseSqlServer(connectionString));
+
+builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+    .AddEntityFrameworkStores<ScaffoldIdentityContext>();
 
 // Add services to the container.
 builder.Services.AddRazorPages();
@@ -17,9 +27,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();;
 
 app.UseAuthorization();
 
 app.MapRazorPages();
 
 app.Run();
+
+endpoints.MapRazorPages();
